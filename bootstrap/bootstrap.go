@@ -2,6 +2,7 @@ package cmd
 
 import (
 	_ "embed"
+
 	"github.com/getsentry/sentry-go"
 	sentryotel "github.com/getsentry/sentry-go/otel"
 	"github.com/happyann/golang-base-lib/env"
@@ -44,7 +45,7 @@ func initSentry() bool {
 	return true
 }
 
-func LoadEnv() {
+func LoadEnv() error {
 	// init env
 	if env.IsLocal() {
 		err := godotenv.Load("local.env")
@@ -70,7 +71,7 @@ func LoadEnv() {
 		)
 		if err != nil {
 			l.Fatal("can't initialize zap logger", zap.Error(err))
-			return
+			return err
 		}
 		logger = l
 	} else {
@@ -112,4 +113,6 @@ func LoadEnv() {
 	)
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(sentryotel.NewSentryPropagator())
+
+	return nil
 }
